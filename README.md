@@ -1,2 +1,2 @@
 # Career-Guidance-Platform
-Career Guidance Platform is a frontend web application that helps students explore suitable career paths based on their interests, with motivational quotes, videos, study resources, and progress tracking.
+The Career Guidance Platform is a web-based application designed to guide students in choosing suitable career paths. It provides step-by-step career roadmaps, learning resources, and motivational content using a simple and user-friendly interface.
