@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teacher Career Roadmap</title>
+
+    <!-- CSS LINK -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <h1>Teacher Career Roadmap</h1>
+
+    <div class="container">
+
+        <div class="roadmap-step">
+            <h3>Step 1: High School Education</h3>
+            <p>Focus on Mathematics, Science, and English to build a strong foundation.</p>
+            <div class="quote">"Education is the most powerful weapon." – Nelson Mandela</div>
+        </div>
+
+        <div class="arrow">↓</div>
+
+        <div class="roadmap-step">
+            <h3>Step 2: Undergraduate Degree</h3>
+            <p>Complete B.Ed or a subject-specific Bachelor's degree.</p>
+        </div>
+
+        <div class="arrow">↓</div>
+
+        <div class="roadmap-step">
+            <h3>Step 3: Clear TET</h3>
+            <p>Clear CTET or State TET to become eligible for teaching.</p>
+        </div>
+
+        <div class="arrow">↓</div>
+
+        <div class="roadmap-step">
+            <h3>Step 4: Start Teaching</h3>
+            <p>Begin as a junior or assistant teacher in schools.</p>
+        </div>
+
+        <div class="arrow">↓</div>
+
+        <div class="roadmap-step">
+            <h3>Step 5: Postgraduate Degree (Optional)</h3>
+            <p>Pursue M.Ed or Master's degree for career growth.</p>
+        </div>
+
+        <div class="arrow">↓</div>
+
+        <div class="roadmap-step">
+            <h3>Step 6: Career Development</h3>
+            <p>Become HOD, Principal, or education consultant.</p>
+        </div>
+
+    </div>
+
+    <div class="footer">
+        © 2025 Career Guidance Platform
+    </div>
+
+    <!-- JS LINK -->
+    <script src="js/script.js"></script>
+</body>
+</html>

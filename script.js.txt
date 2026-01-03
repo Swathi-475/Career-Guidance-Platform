@@ -1,0 +1,2 @@
+console.log("Career Guidance Platform Loaded Successfully");
+

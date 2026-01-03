@@ -1,0 +1,556 @@
+import { useState } from 'react'
+import { Button } from "/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "/components/ui/card"
+import { Input } from "/components/ui/input"
+import { Label } from "/components/ui/label"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Textarea } from "@/components/ui/textarea"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { BookOpen, Video, FileText, Calculator, Beaker, Globe, Code, Brain, Palette, Music, Dumbbell, Microscope, Search, Download, Play, Star, Users, Target, BookMarked } from 'lucide-react'
+
+interface UserProfile {
+  name: string
+  grade: string
+  stream: string
+  subjects: string[]
+  careerInterest: string
+}
+
+interface Textbook {
+  id: number
+  title: string
+  grade: string
+  subject: string
+  type: 'textbook' | 'guide' | 'workbook'
+  chapters: string[]
+  downloadUrl?: string
+}
+
+interface VideoResource {
+  id: number
+  title: string
+  grade: string
+  subject: string
+  duration: string
+  description: string
+  thumbnail: string
+}
+
+interface CareerPath {
+  title: string
+  description: string
+  gradeLevel: string
+  requiredSubjects: string[]
+  entranceExams: string[]
+  avgSalary: string
+  colleges: string[]
+}
+
+const textbooks: Textbook[] = [
+  // 1st-5th
+  { id: 1, title: "Mathematics Grade 1", grade: "1", subject: "Mathematics", type: "textbook", chapters: ["Numbers", "Addition", "Subtraction", "Shapes"] },
+  { id: 2, title: "Environmental Studies Grade 2", grade: "2", subject: "EVS", type: "textbook", chapters: ["Plants", "Animals", "Weather", "Safety"] },
+  { id: 3, title: "English Grammar Grade 3", grade: "3", subject: "English", type: "workbook", chapters: ["Nouns", "Verbs", "Adjectives", "Tenses"] },
+  { id: 4, title: "Science Grade 4", grade: "4", subject: "Science", type: "textbook", chapters: ["Food", "Materials", "Plants", "Animals"] },
+  { id: 5, title: "Social Studies Grade 5", grade: "5", subject: "Social Science", type: "textbook", chapters: ["History", "Geography", "Civics"] },
+  
+  // 6th-8th
+  { id: 6, title: "Mathematics Grade 6", grade: "6", subject: "Mathematics", type: "textbook", chapters: ["Numbers", "Algebra", "Geometry", "Data"] },
+  { id: 7, title: "Science Grade 7", grade: "7", subject: "Science", type: "textbook", chapters: ["Nutrition", "Heat", "Light", "Motion"] },
+  { id: 8, title: "Mathematics Grade 8", grade: "8", subject: "Mathematics", type: "textbook", chapters: ["Rational Numbers", "Linear Equations", "Geometry", "Mensuration"] },
+  
+  // 9th-10th
+  { id: 9, title: "Science Class 9 NCERT", grade: "9", subject: "Science", type: "textbook", chapters: ["Matter", "Atoms", "Cells", "Force", "Energy"] },
+  { id: 10, title: "Mathematics Class 10", grade: "10", subject: "Mathematics", type: "textbook", chapters: ["Real Numbers", "Polynomials", "Geometry", "Trigonometry"] },
+  
+  // 11th-12th
+  { id: 11, title: "Physics Class 11", grade: "11", subject: "Physics", type: "textbook", chapters: ["Units", "Motion", "Laws", "Work", "Energy"] },
+  { id: 12, title: "Chemistry Class 12", grade: "12", subject: "Chemistry", type: "textbook", chapters: ["Solutions", "Electrochemistry", "Chemical Kinetics", "Metallurgy"] },
+  { id: 13, title: "Biology Class 11", grade: "11", subject: "Biology", type: "textbook", chapters: ["Diversity", "Cell", "Plant Physiology", "Human Physiology"] },
+  { id: 14, title: "Mathematics Class 12", grade: "12", subject: "Mathematics", type: "textbook", chapters: ["Relations", "Functions", "Calculus", "Vectors"] },
+  
+  // B.Tech
+  { id: 15, title: "Engineering Mathematics 1", grade: "B.Tech", subject: "Engineering", type: "textbook", chapters: ["Calculus", "Linear Algebra", "Differential Equations"] },
+  { id: 16, title: "Data Structures & Algorithms", grade: "B.Tech", subject: "Computer Science", type: "textbook", chapters: ["Arrays", "Linked Lists", "Trees", "Graphs", "Sorting"] },
+  { id: 17, title: "Digital Electronics", grade: "B.Tech", subject: "Electronics", type: "textbook", chapters: ["Logic Gates", "Combinational Circuits", "Sequential Circuits"] },
+]
+
+const videoResources: VideoResource[] = [
+  // 1st-5th
+  { id: 1, title: "Learning Numbers 1-100", grade: "1", subject: "Mathematics", duration: "15 min", description: "Interactive counting and number recognition", thumbnail: "math" },
+  { id: 2, title: "Parts of Plants", grade: "3", subject: "Science", duration: "10 min", description: "Learn about roots, stem, leaves and flowers", thumbnail: "science" },
+  { id: 3, title: "English Alphabet Song", grade: "1", subject: "English", duration: "5 min", description: "Fun way to learn A-Z with phonics", thumbnail: "english" },
+  
+  // 6th-8th
+  { id: 4, title: "Fractions Made Easy", grade: "6", subject: "Mathematics", duration: "20 min", description: "Understanding fractions with visual examples", thumbnail: "math" },
+  { id: 5, title: "Photosynthesis Process", grade: "7", subject: "Science", duration: "12 min", description: "How plants make their food", thumbnail: "science" },
+  { id: 6, title: "Ancient Civilizations", grade: "6", subject: "Social Science", duration: "18 min", description: "Journey through Indus Valley Civilization", thumbnail: "social" },
+  
+  // 9th-10th
+  { id: 7, title: "Trigonometry Basics", grade: "10", subject: "Mathematics", duration: "25 min", description: "Introduction to trigonometric ratios", thumbnail: "math" },
+  { id: 8, title: "Chemical Reactions", grade: "10", subject: "Science", duration: "15 min", description: "Types of chemical reactions with experiments", thumbnail: "science" },
+  { id: 9, title: "Democratic Rights", grade: "9", subject: "Social Science", duration: "20 min", description: "Understanding fundamental rights in India", thumbnail: "social" },
+  
+  // 11th-12th
+  { id: 10, title: "Newton's Laws of Motion", grade: "11", subject: "Physics", duration: "30 min", description: "Detailed explanation with real-life examples", thumbnail: "physics" },
+  { id: 11, title: "Organic Chemistry Basics", grade: "12", subject: "Chemistry", duration: "35 min", description: "Introduction to hydrocarbons and nomenclature", thumbnail: "chemistry" },
+  { id: 12, title: "Human Digestive System", grade: "11", subject: "Biology", duration: "28 min", description: "Complete journey of food through our body", thumbnail: "biology" },
+  
+  // B.Tech
+  { id: 13, title: "Introduction to Programming", grade: "B.Tech", subject: "Computer Science", duration: "45 min", description: "First steps in C/C++ programming", thumbnail: "code" },
+  { id: 14, title: "Circuit Analysis", grade: "B.Tech", subject: "Electronics", duration: "40 min", description: "KVL and KCL with solved examples", thumbnail: "electronics" },
+  { id: 15, title: "Calculus for Engineers", grade: "B.Tech", subject: "Mathematics", duration: "50 min", description: "Applications of differentiation and integration", thumbnail: "math" },
+]
+
+const careerPaths: CareerPath[] = [
+  {
+    title: "Software Engineer",
+    description: "Design and develop software applications and systems",
+    gradeLevel: "11-12, B.Tech",
+    requiredSubjects: ["Mathematics", "Physics", "Computer Science"],
+    entranceExams: ["JEE", "BITSAT", "VITEEE"],
+    avgSalary: "₹8-25 LPA",
+    colleges: ["IITs", "NITs", "IIITs", "BITS"]
+  },
+  {
+    title: "Doctor",
+    description: "Medical professional diagnosing and treating patients",
+    gradeLevel: "11-12, MBBS",
+    requiredSubjects: ["Biology", "Chemistry", "Physics"],
+    entranceExams: ["NEET", "AIIMS"],
+    avgSalary: "₹6-30 LPA",
+    colleges: ["AIIMS", "JIPMER", "CMC", "AFMC"]
+  },
+  {
+    title: "Civil Engineer",
+    description: "Design and oversee construction of infrastructure",
+    gradeLevel: "11-12, B.Tech",
+    requiredSubjects: ["Mathematics", "Physics", "Chemistry"],
+    entranceExams: ["JEE", "MHT-CET", "COMEDK"],
+    avgSalary: "₹5-15 LPA",
+    colleges: ["IITs", "NITs", "State Engineering Colleges"]
+  },
+  {
+    title: "Teacher",
+    description: "Educate and inspire students across various subjects",
+    gradeLevel: "All Grades",
+    requiredSubjects: ["Any Subject Specialization"],
+    entranceExams: ["CTET", "State TET"],
+    avgSalary: "₹3-12 LPA",
+    colleges: ["Central Universities", "State Universities"]
+  }
+]
+
+const subjectIcons: { [key: string]: React.ReactNode } = {
+  Mathematics: <Calculator className="w-5 h-5" />,
+  Science: <Beaker className="w-5 h-5" />,
+  Physics: <Microscope className="w-5 h-5" />,
+  Chemistry: <Beaker className="w-5 h-5" />,
+  Biology: <Brain className="w-5 h-5" />,
+  English: <Globe className="w-5 h-5" />,
+  "Social Science": <Globe className="w-5 h-5" />,
+  "Computer Science": <Code className="w-5 h-5" />,
+  Engineering: <Dumbbell className="w-5 h-5" />,
+  Electronics: <Microscope className="w-5 h-5" />,
+  EVS: <Palette className="w-5 h-5" />,
+}
+
+export default function EnhancedCareerGuidancePlatform() {
+  const [userProfile, setUserProfile] = useState<UserProfile>({
+    name: '',
+    grade: '1',
+    stream: '',
+    subjects: [],
+    careerInterest: ''
+  })
+  const [searchQuery, setSearchQuery] = useState('')
+  const [selectedSubject, setSelectedSubject] = useState('all')
+  const [selectedType, setSelectedType] = useState<'all' | 'textbook' | 'guide' | 'workbook'>('all')
+
+  const handleProfileUpdate = (field: keyof UserProfile, value: string | string[]) => {
+    setUserProfile(prev => ({ ...prev, [field]: value }))
+  }
+
+  const filteredTextbooks = textbooks.filter(book => {
+    const matchesGrade = userProfile.grade ? book.grade === userProfile.grade : true
+    const matchesSubject = selectedSubject === 'all' || book.subject === selectedSubject
+    const matchesType = selectedType === 'all' || book.type === selectedType
+    const matchesSearch = book.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         book.subject.toLowerCase().includes(searchQuery.toLowerCase())
+    
+    return matchesGrade && matchesSubject && matchesType && matchesSearch
+  })
+
+  const filteredVideos = videoResources.filter(video => {
+    const matchesGrade = userProfile.grade ? video.grade === userProfile.grade : true
+    const matchesSubject = selectedSubject === 'all' || video.subject === selectedSubject
+    const matchesSearch = video.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         video.description.toLowerCase().includes(searchQuery.toLowerCase())
+    
+    return matchesGrade && matchesSubject && matchesSearch
+  })
+
+  const recommendedCareers = careerPaths.filter(career => {
+    if (!userProfile.grade) return true
+    
+    const gradeNum = parseInt(userProfile.grade)
+    if (userProfile.grade === 'B.Tech') return career.gradeLevel.includes('B.Tech')
+    if (gradeNum >= 11) return career.gradeLevel.includes('11-12')
+    return true
+  })
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+      {/* Header */}
+      <header className="bg-white shadow-lg">
+        <div className="max-w-7xl mx-auto px-4 py-6">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <BookMarked className="w-8 h-8 text-blue-600" />
+              <div>
+                <h1 className="text-2xl font-bold text-gray-900">EduCareer Hub</h1>
+                <p className="text-sm text-gray-600">Complete Study & Career Guidance</p>
+              </div>
+            </div>
+            <div className="flex items-center space-x-4">
+              <div className="text-sm">
+                <span className="text-gray-600">Welcome</span>
+                {userProfile.name && <span className="font-semibold ml-1">{userProfile.name}</span>}
+              </div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        {/* Profile Section */}
+        <Card className="mb-8">
+          <CardHeader>
+            <CardTitle>Your Learning Profile</CardTitle>
+            <CardDescription>Set your grade to get personalized content</CardDescription>
+          </CardHeader>
+          <CardContent className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div>
+              <Label>Your Name</Label>
+              <Input
+                value={userProfile.name}
+                onChange={(e) => handleProfileUpdate('name', e.target.value)}
+                placeholder="Enter your name"
+              />
+            </div>
+            <div>
+              <Label>Current Grade</Label>
+              <Select value={userProfile.grade} onValueChange={(value) => handleProfileUpdate('grade', value)}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(grade => (
+                    <SelectItem key={grade} value={grade.toString()}>{grade} Grade</SelectItem>
+                  ))}
+                  <SelectItem value="B.Tech">B.Tech</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            {userProfile.grade === '11' || userProfile.grade === '12' ? (
+              <div>
+                <Label>Stream</Label>
+                <Select value={userProfile.stream} onValueChange={(value) => handleProfileUpdate('stream', value)}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select stream" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Science">Science (PCM/PCB)</SelectItem>
+                    <SelectItem value="Commerce">Commerce</SelectItem>
+                    <SelectItem value="Arts">Arts/Humanities</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            ) : null}
+            <div>
+              <Label>Career Interest</Label>
+              <Input
+                value={userProfile.careerInterest}
+                onChange={(e) => handleProfileUpdate('careerInterest', e.target.value)}
+                placeholder="e.g., Engineer, Doctor"
+              />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Tabs defaultValue="textbooks" className="w-full">
+          <TabsList className="grid w-full grid-cols-4">
+            <TabsTrigger value="textbooks">
+              <BookOpen className="w-4 h-4 mr-2" />
+              Textbooks
+            </TabsTrigger>
+            <TabsTrigger value="videos">
+              <Video className="w-4 h-4 mr-2" />
+              Video Lessons
+            </TabsTrigger>
+            <TabsTrigger value="careers">
+              <Target className="w-4 h-4 mr-2" />
+              Career Guide
+            </TabsTrigger>
+            <TabsTrigger value="study">
+              <Users className="w-4 h-4 mr-2" />
+              Study Tips
+            </TabsTrigger>
+          </TabsList>
+
+          {/* Textbooks Tab */}
+          <TabsContent value="textbooks" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Textbooks & Study Materials</CardTitle>
+                <CardDescription>Complete collection for your grade level</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex flex-col md:flex-row gap-4 mb-6">
+                  <Input
+                    placeholder="Search textbooks..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="flex-1"
+                  />
+                  <Select value={selectedSubject} onValueChange={setSelectedSubject}>
+                    <SelectTrigger className="w-full md:w-40">
+                      <SelectValue placeholder="All Subjects" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Subjects</SelectItem>
+                      <SelectItem value="Mathematics">Mathematics</SelectItem>
+                      <SelectItem value="Science">Science</SelectItem>
+                      <SelectItem value="English">English</SelectItem>
+                      <SelectItem value="Social Science">Social Science</SelectItem>
+                      <SelectItem value="Computer Science">Computer Science</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <Select value={selectedType} onValueChange={(value) => setSelectedType(value as any)}>
+                    <SelectTrigger className="w-full md:w-32">
+                      <SelectValue placeholder="All Types" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Types</SelectItem>
+                      <SelectItem value="textbook">Textbook</SelectItem>
+                      <SelectItem value="guide">Guide</SelectItem>
+                      <SelectItem value="workbook">Workbook</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {filteredTextbooks.map((book) => (
+                    <Card key={book.id} className="hover:shadow-lg transition-shadow">
+                      <CardHeader>
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center space-x-2">
+                            <div className="p-2 bg-blue-100 rounded-lg">
+                              {subjectIcons[book.subject] || <BookOpen className="w-5 h-5" />}
+                            </div>
+                            <div>
+                              <CardTitle className="text-lg">{book.title}</CardTitle>
+                              <CardDescription>Grade {book.grade} • {book.subject}</CardDescription>
+                            </div>
+                          </div>
+                        </div>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="space-y-2">
+                          <div className="flex items-center justify-between text-sm">
+                            <span className="bg-gray-100 px-2 py-1 rounded">{book.type}</span>
+                            <span className="text-gray-600">{book.chapters.length} chapters</span>
+                          </div>
+                          <div className="text-sm text-gray-600">
+                            Chapters: {book.chapters.slice(0, 3).join(', ')}...
+                          </div>
+                          <Button className="w-full mt-3" variant="outline">
+                            <Download className="w-4 h-4 mr-2" />
+                            Download PDF
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Videos Tab */}
+          <TabsContent value="videos" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Video Lessons</CardTitle>
+                <CardDescription>Interactive video tutorials for better understanding</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex flex-col md:flex-row gap-4 mb-6">
+                  <Input
+                    placeholder="Search videos..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="flex-1"
+                  />
+                  <Select value={selectedSubject} onValueChange={setSelectedSubject}>
+                    <SelectTrigger className="w-full md:w-40">
+                      <SelectValue placeholder="All Subjects" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Subjects</SelectItem>
+                      <SelectItem value="Mathematics">Mathematics</SelectItem>
+                      <SelectItem value="Science">Science</SelectItem>
+                      <SelectItem value="Physics">Physics</SelectItem>
+                      <SelectItem value="Chemistry">Chemistry</SelectItem>
+                      <SelectItem value="Biology">Biology</SelectItem>
+                      <SelectItem value="Computer Science">Computer Science</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {filteredVideos.map((video) => (
+                    <Card key={video.id} className="hover:shadow-lg transition-shadow">
+                      <div className="aspect-video bg-gradient-to-br from-blue-400 to-purple-500 rounded-t-lg flex items-center justify-center">
+                        <Play className="w-12 h-12 text-white" />
+                      </div>
+                      <CardHeader>
+                        <CardTitle className="text-lg">{video.title}</CardTitle>
+                        <CardDescription>Grade {video.grade} • {video.subject}</CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <p className="text-sm text-gray-600 mb-3">{video.description}</p>
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm text-gray-500">{video.duration}</span>
+                          <Button size="sm">
+                            <Play className="w-4 h-4 mr-1" />
+                            Watch
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Career Guide Tab */}
+          <TabsContent value="careers" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Career Guidance</CardTitle>
+                <CardDescription>Explore career paths based on your grade and interests</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {recommendedCareers.map((career, index) => (
+                    <Card key={index} className="hover:shadow-lg transition-shadow">
+                      <CardHeader>
+                        <CardTitle className="text-xl">{career.title}</CardTitle>
+                        <CardDescription>{career.description}</CardDescription>
+                      </CardHeader>
+                      <CardContent className="space-y-3">
+                        <div>
+                          <strong className="text-sm">Best for:</strong>
+                          <p className="text-sm text-gray-600">{career.gradeLevel}</p>
+                        </div>
+                        <div>
+                          <strong className="text-sm">Required Subjects:</strong>
+                          <p className="text-sm text-gray-600">{career.requiredSubjects.join(', ')}</p>
+                        </div>
+                        <div>
+                          <strong className="text-sm">Entrance Exams:</strong>
+                          <p className="text-sm text-gray-600">{career.entranceExams.join(', ')}</p>
+                        </div>
+                        <div>
+                          <strong className="text-sm">Top Colleges:</strong>
+                          <p className="text-sm text-gray-600">{career.colleges.join(', ')}</p>
+                        </div>
+                        <div>
+                          <strong className="text-sm">Average Salary:</strong>
+                          <p className="text-sm font-semibold text-green-600">{career.avgSalary}</p>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Study Tips Tab */}
+          <TabsContent value="study" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Study Tips & Strategies</CardTitle>
+                <CardDescription>Expert advice for academic success</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-lg">Time Management</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <ul className="space-y-2 text-sm text-gray-600">
+                        <li>• Create a study schedule</li>
+                        <li>• Use Pomodoro technique (25 min study, 5 min break)</li>
+                        <li>• Prioritize difficult subjects</li>
+                        <li>• Take regular short breaks</li>
+                      </ul>
+                    </CardContent>
+                  </Card>
+                  
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-lg">Exam Preparation</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <ul className="space-y-2 text-sm text-gray-600">
+                        <li>• Solve previous year papers</li>
+                        <li>• Practice with mock tests</li>
+                        <li>• Revise regularly, not just before exams</li>
+                        <li>• Focus on understanding, not memorization</li>
+                      </ul>
+                    </CardContent>
+                  </Card>
+                  
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-lg">Healthy Study Habits</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <ul className="space-y-2 text-sm text-gray-600">
+                        <li>• Get 7-8 hours of sleep</li>
+                        <li>• Stay hydrated and eat healthy</li>
+                        <li>• Exercise regularly</li>
+                        <li>• Keep your study space organized</li>
+                      </ul>
+                    </CardContent>
+                  </Card>
+                  
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-lg">Online Learning</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <ul className="space-y-2 text-sm text-gray-600">
+                        <li>• Use video lessons for visual learning</li>
+                        <li>• Join online study groups</li>
+                        <li>• Take notes while watching videos</li>
+                        <li>• Practice with online quizzes</li>
+                      </ul>
+                    </CardContent>
+                  </Card>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
+      </div>
+    </div>
+  )
+}
+Share
+Refresh
